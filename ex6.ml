@@ -147,15 +147,8 @@ let rec comptree x n =
 	match n with
 	| 0 -> Lf
 	| n' ->
-		let subtree = comptree x (n - 1)
-		in
-		Br (subtree, x, subtree);;
-
-let comptree' n =
-	let rec comptree'' x n =
-		match n with
-		| 0 -> Lf
-		| n' ->
-			Br ((comptree'' (2 * x + 1) (n - 1)), x ,(comptree'' (2 * x) (n - 1)))
+	let subtree = comptree x (n - 1)
 	in
-	comptree'' 1 n;;
+	Br (subtree, x, subtree);;
+
+
