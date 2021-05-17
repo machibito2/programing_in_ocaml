@@ -169,3 +169,16 @@ let comptree' n =
 	in
 	comptree'' 1 n;;
 
+(* 6.6 *)
+
+let rec preord res = function
+	| Lf -> res
+	| Br (x, left, right) -> x :: (preord (preord res right) left);;
+
+let rec inord res = function
+	| Lf -> res
+	| Br (x, left, right) -> inord (x :: preord (res) right) left;;
+
+let rec postord res = function
+	| Lf -> res
+	| Br (x, left, right) -> postord (postord (x :: res) right) left;;
