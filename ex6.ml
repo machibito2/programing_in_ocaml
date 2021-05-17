@@ -1,3 +1,5 @@
+(* 6.1 *)
+
 type figure =
 	| Point
 	| Circle of int
@@ -16,6 +18,8 @@ type 'a with_location = {loc_x : float; loc_y: float; body: 'a};;
 
 let a = {loc_x = 2.; loc_y = 3.; body = Circle 1};;
 let b = {loc_x = 2.; loc_y = 2.; body = Rectangle (2, 2)};;
+
+(* 6.2 *)
 
 let rec overlap (x) (y) =
 	let pow2 x =
@@ -67,6 +71,8 @@ let rec overlap (x) (y) =
 	| (Square l1, Square l2) -> overlap {a with body = Rectangle (l1, l1)} {b with body = Rectangle (l2, l2)}
 	| (Point, Square l1) -> overlap a {b with body = Rectangle (l1, l1)}
 	| (Square l1, Point) -> overlap b a
+
+(* 6.3 *)
 
 type nat = Zero | OneMoreThan of nat;;
 
@@ -121,6 +127,8 @@ let monus m n =
 	in
 	monus' m n;;
 
+(* 6.4 *)
+
 let minus m n =
 	let rec minus' m n =
 		match m with
@@ -140,8 +148,9 @@ let minus m n =
 
 minus (nthNat 5) (nthNat 3);;
 
-(* 見やすさのために真ん中を要素にしてみちゃったりした *)
-type 'a tree = Lf | Br of 'a tree * 'a * 'a tree;;
+(* 6.5 *)
+
+type 'a tree = Lf | Br of 'a * 'a tree * 'a tree;;
 
 let rec comptree x n =
 	match n with
@@ -149,13 +158,14 @@ let rec comptree x n =
 	| n' ->
 		let subtree = comptree x (n - 1)
 		in
-		Br (subtree, x, subtree);;
+		Br (x, subtree, subtree);;
 
 let comptree' n =
 	let rec comptree'' x n =
 		match n with
 		| 0 -> Lf
 		| n' ->
-			Br ((comptree'' (2 * x + 1) (n - 1)), x ,(comptree'' (2 * x) (n - 1)))
+			Br (x, (comptree'' (2 * x + 1) (n - 1)) ,(comptree'' (2 * x) (n - 1)))
 	in
 	comptree'' 1 n;;
+
