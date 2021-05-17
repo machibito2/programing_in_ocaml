@@ -139,3 +139,16 @@ let minus m n =
 	minus' m n;;
 
 minus (nthNat 5) (nthNat 3);;
+
+(* 見やすさのために真ん中を要素にしてみちゃったりした *)
+type 'a tree = Lf | Br of 'a tree * 'a * 'a tree;;
+
+let rec comptree x n =
+	match n with
+	| 0 -> Lf
+	| n' ->
+	let subtree = comptree x (n - 1)
+	in
+	Br (subtree, x, subtree);;
+
+
