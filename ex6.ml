@@ -177,8 +177,38 @@ let rec preord res = function
 
 let rec inord res = function
 	| Lf -> res
-	| Br (x, left, right) -> inord (x :: preord (res) right) left;;
+	| Br (x, left, right) -> inord (x :: inord (res) right) left;;
 
 let rec postord res = function
 	| Lf -> res
 	| Br (x, left, right) -> postord (postord (x :: res) right) left;;
+
+(* 6.7 *)
+
+let comptree = Br(1,
+					Br(2,
+						Br(4, Lf, Lf),
+						Br(5, Lf, Lf)),
+					Br(3,
+						Br(6, Lf, Lf),
+						Br(7, Lf, Lf)));;
+
+let rec fold_left f e l =
+	match l with
+	| [] -> e
+	| v :: rest -> fold_left f (f e v) rest;;
+
+let reverse l = fold_left (fun x y -> y :: x) [] l;;
+
+let rec reflect t =
+	match t with
+	| Lf -> Lf
+	| Br (x, left, right) -> Br (x, reflect right, reflect left);;
+
+let rec inorder = function
+	Lf -> []
+	| Br (x, left, right) -> (inorder left) @ (x::inorder right);;
+
+preord [] (reflect comptree) = reverse (postord [] comptree);;
+inord [] (reflect comptree) = reverse (inord [] comptree);;
+postord [] (reflect comptree) = reverse (preord [] comptree);;
