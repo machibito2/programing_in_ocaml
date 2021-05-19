@@ -212,3 +212,47 @@ let rec inorder = function
 preord [] (reflect comptree) = reverse (postord [] comptree);;
 inord [] (reflect comptree) = reverse (inord [] comptree);;
 postord [] (reflect comptree) = reverse (preord [] comptree);;
+
+(* 6.8 *)
+type 'a tree = Lf | Br of 'a * 'a tree * 'a tree;;
+type 'a rosetree = RLf | RBr of 'a * 'a rosetree list;;
+
+let rec map f l =
+	match l with
+	| [] -> []
+	| v :: rest -> (f v) :: map f rest;;
+
+let rec tree_of_rtree = function
+	| RLf -> Br (None, Lf, Lf)
+	| RBr (a, rtrees) -> Br (Some a, tree_of_rtreelist rtrees, Lf)
+and tree_of_rtreelist = function
+	| [] -> Lf
+	| rtree :: rest -> let Br (a, left, Lf) = tree_of_rtree rtree
+	in
+	Br (a, left, tree_of_rtreelist rest);;
+
+let rtree = RBr ("a", [RBr ("b", [RBr ("c", [RLf]); RLf; RBr ("d", [RLf])]); RBr ("e", [RLf]); RBr ("f", [RLf])]);;
+
+(* let rec testMigi res = function
+	| Lf -> res
+	| Br (a, left, right) -> RBr(a, testMigi [] right) :: res;; *)
+
+(* 6.8 *)
+
+let rtree_of_tree t =
+	let rec rtree_of_tree' = function
+		| Lf -> [RLf]
+		| Br (None, Lf, Lf) -> [RLf]
+		| Br (None, Lf, right) -> RLf :: (rtree_of_tree' right)
+		| Br (Some a, left, Lf) -> [RBr (a, rtree_of_tree' left)]
+		| Br (Some a, left, right) -> RBr (a, rtree_of_tree' left) :: (rtree_of_tree' right)
+	in
+	let ans = rtree_of_tree' t
+	in
+	match ans with
+	| [ans] -> ans;;
+
+
+let rtree = RBr ("a", [RBr ("b", [RBr ("c", [RLf]); RLf; RBr ("d", [RLf])]); RBr ("e", [RLf]); RBr ("f", [RLf])]);;
+
+rtree_of_tree (tree_of_rtree rtree) = rtree;;

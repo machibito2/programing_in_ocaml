@@ -154,7 +154,7 @@ let rec preord res = function
 
 let rec inord res = function
 	| Lf -> res
-	| Br (x, left, right) -> inord (x :: preord (res) right) left;;
+	| Br (x, left, right) -> inord (x :: inord (res) right) left;;
 
 let rec postord res = function
 	| Lf -> res
@@ -216,7 +216,7 @@ and tree_of_rosetreelist = function
 	| [] -> Lf
 	| rtree :: rest -> let Br (a, left, Lf) = tree_of_rosetree rtree
 	in
-		Br (a, left, tree_of_rosetreelist rest);;
+	Br (a, left, tree_of_rosetreelist rest);;
 
 type intseq = Cons of int * (int -> intseq);;
 let rec step1 x = Cons ((x + 1), step1);;
