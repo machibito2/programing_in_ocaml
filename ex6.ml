@@ -256,3 +256,31 @@ let rtree_of_tree t =
 let rtree = RBr ("a", [RBr ("b", [RBr ("c", [RLf]); RLf; RBr ("d", [RLf])]); RBr ("e", [RLf]); RBr ("f", [RLf])]);;
 
 rtree_of_tree (tree_of_rtree rtree) = rtree;;
+
+(* 6.9 *)
+(* 適当にスタックでやった *)
+(* ちゃんとやれば木になるんじゃないですか?眠いので寝ます *)
+
+type token = PCDATA of string | Open of string | Close of string;;
+
+let token_list = [Open "a"; Close "a"; Open "b"; Close "b"; Open "c"; PCDATA "Hello"; Close "c";];;
+
+let rec makeXML stack res = function
+	| [] when stack = [] -> res
+	| (Close a) :: rest ->
+		(
+			match stack with
+			| v :: rrest when a = v -> makeXML rrest (res ^ ("</" ^ a ^ ">")) rest
+			| _ -> "dame"
+		)
+	| (Open a) :: rest -> makeXML (a :: stack) (res ^ ("<" ^ a ^ ">")) rest
+	| (PCDATA a) :: rest when stack <> [] -> makeXML stack (res ^ a) rest
+	| _ -> "dame";;
+
+(*
+
+[RBr ("R",
+  [RBr ("a", [RLf]); RBr ("b", [RLf]); RBr ("b", [RLf]); RBr ("c", [RLf]);
+   RBr ("Hello", [RLf]); RBr ("c", [RLf]); RBr ("a", [RLf])])]
+
+ *)

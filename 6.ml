@@ -195,7 +195,7 @@ let rec string_of_xml xmlIn =
 	| XBr (tag, xml_list) -> "<" ^ tag ^ ">" ^ string_of_xmllist xml_list ^ "</" ^ tag ^ ">"
 	| XLf None -> ""
 	| XLf (Some s) -> s
-	and string_of_xmllist xmlIn =
+and string_of_xmllist xmlIn =
 	match xmlIn with
 	| [] -> ""
 	| xml :: rest -> string_of_xml xml ^ string_of_xmllist rest;;
