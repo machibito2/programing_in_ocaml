@@ -307,3 +307,100 @@ let rec expand = function
 	| Add (left, right) -> Add (expand (left), expand (right))
 	| Const c -> Const c;;
 
+(* 6.12 *)
+(* ひまだったしチェックするやつをいっぱい書いた *)
+(* permutationは引用した *)
+
+type bst = BSTLf | BSTBr of int * bst * bst;;
+
+let rec bstInsert a = function
+	| BSTLf -> BSTBr (a, BSTLf, BSTLf)
+	| BSTBr (v, left, right) ->
+		if v < a then
+			BSTBr (v, bstInsert a left, right)
+		else
+			BSTBr (v, left, bstInsert a right);;
+
+let rec bstInsertList res = function
+	| [] -> res
+	| v :: rest -> bstInsertList (bstInsert v res) rest;;
+
+let rec member a = function
+	| [] -> ([a], false)
+	| v :: rest ->
+	(
+		match v with
+		| (left, right) ->
+			if a = right then
+				(a :: left, true)
+			else
+				member a rest
+	);;
+
+let rec numberOfMember = function
+	| [] -> 0
+	| v :: rest -> 1 + numberOfMember rest;;
+
+let rec check res = function
+	| [] -> res
+	| v :: rest ->
+	(
+		let ans = bstInsertList BSTLf v
+		in
+		let rec loop a = function
+			| [] -> [([a], ans)]
+			| (left, right) :: rest ->
+				if ans = right then
+					(a :: left, right) :: rest
+				else
+					(left, right) :: loop a rest
+		in
+		check (loop v res) rest
+	);;
+
+let rec interleave x lst =
+	match lst with
+	| [] -> [[x]]
+	| hd::tl -> (x::lst) :: (List.map (fun y -> hd::y) (interleave x tl))
+
+let rec permutations lst =
+	match lst with
+	| hd::tl -> List.concat (List.map (interleave hd) (permutations tl))
+	| _ -> [lst];;
+
+let a = check [] (permutations [1;2;3;4]);;
+
+(*
+ [[[1; 2; 3; 4]];
+ [[2; 3; 4; 1]; [2; 3; 1; 4]; [2; 1; 3; 4]];
+ [[1; 3; 4; 2]; [1; 3; 2; 4]];
+ [[3; 4; 1; 2]; [3; 1; 4; 2]; [3; 1; 2; 4]];
+ [[3; 4; 2; 1]; [3; 2; 4; 1]; [3; 2; 1; 4]];
+ [[1; 2; 4; 3]];
+ [[2; 4; 3; 1]; [2; 4; 1; 3]; [2; 1; 4; 3]];
+ [[1; 4; 2; 3]];
+ [[4; 1; 2; 3]];
+ [[4; 2; 3; 1]; [4; 2; 1; 3]];
+ [[1; 4; 3; 2]];
+ [[4; 1; 3; 2]];
+ [[4; 3; 1; 2]];
+ [[4; 3; 2; 1]]]
+*)
+
+(*
+ [
+ BSTBr (1, BSTBr (2, BSTBr (3, BSTBr (4, BSTLf, BSTLf), BSTLf), BSTLf),BSTLf);
+ BSTBr (2, BSTBr (3, BSTBr (4, BSTLf, BSTLf), BSTLf),BSTBr (1, BSTLf, BSTLf));
+ BSTBr (1, BSTBr (3, BSTBr (4, BSTLf, BSTLf), BSTBr (2, BSTLf, BSTLf)),BSTLf);
+ BSTBr (3, BSTBr (4, BSTLf, BSTLf),BSTBr (1, BSTBr (2, BSTLf, BSTLf), BSTLf));
+ BSTBr (3, BSTBr (4, BSTLf, BSTLf),BSTBr (2, BSTLf, BSTBr (1, BSTLf, BSTLf)));
+ BSTBr (1, BSTBr (2, BSTBr (4, BSTLf, BSTBr (3, BSTLf, BSTLf)), BSTLf),BSTLf);
+ BSTBr (2, BSTBr (4, BSTLf, BSTBr (3, BSTLf, BSTLf)),BSTBr (1, BSTLf, BSTLf));
+ BSTBr (1, BSTBr (4, BSTLf, BSTBr (2, BSTBr (3, BSTLf, BSTLf), BSTLf)),BSTLf);
+ BSTBr (4, BSTLf,BSTBr (1, BSTBr (2, BSTBr (3, BSTLf, BSTLf), BSTLf), BSTLf));
+ BSTBr (4, BSTLf,BSTBr (2, BSTBr (3, BSTLf, BSTLf), BSTBr (1, BSTLf, BSTLf)));
+ BSTBr (1, BSTBr (4, BSTLf, BSTBr (3, BSTLf, BSTBr (2, BSTLf, BSTLf))),BSTLf);
+ BSTBr (4, BSTLf,BSTBr (1, BSTBr (3, BSTLf, BSTBr (2, BSTLf, BSTLf)), BSTLf));
+ BSTBr (4, BSTLf,BSTBr (3, BSTLf, BSTBr (1, BSTBr (2, BSTLf, BSTLf), BSTLf)));
+ BSTBr (4, BSTLf,BSTBr (3, BSTLf, BSTBr (2, BSTLf, BSTBr (1, BSTLf, BSTLf))))]
+*)
