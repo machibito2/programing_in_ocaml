@@ -288,4 +288,22 @@ let rec eval = function
 	| Const c -> c;;
 
 let exp = Mul (Add (Const 3, Const 4), Add (Const 2, Const 5));;
+let exp = Mul (Add (Const 3, Const 4), Add (Const 2, Const 5));;
 eval exp;;
+
+(* 6.11 *)
+(* なんとかしてstring_of_arithの最外カッコを消すとカッコが減っていい感じだけどめんどうだからやらない *)
+
+let rec string_of_arith = function
+	| Mul (left, right) -> "(" ^ (string_of_arith left) ^ "*" ^ (string_of_arith right) ^ ")"
+	| Add (left, right) -> "(" ^ (string_of_arith left) ^ "+" ^ (string_of_arith right) ^ ")"
+	| Const c -> string_of_int c;;
+
+let rec expand = function
+	| Mul (Add (lleft, lright), Add (rleft, rright)) -> Add (Add (Mul (lleft, rleft), Mul (lleft, rright)), Add (Mul (lright, rleft), Mul (lright, rright)))
+	| Mul (left, Add (rleft, rright)) -> Add (Mul (left, rleft), Mul (left, rright))
+	| Mul (Add (lleft, lright), right) -> Add (Mul (lleft, right), Mul (lright, right))
+	| Mul (left, right) -> Mul (expand (left), expand (right))
+	| Add (left, right) -> Add (expand (left), expand (right))
+	| Const c -> Const c;;
+
