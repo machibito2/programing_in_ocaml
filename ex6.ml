@@ -238,6 +238,7 @@ let rtree = RBr ("a", [RBr ("b", [RBr ("c", [RLf]); RLf; RBr ("d", [RLf])]); RBr
 	| Br (a, left, right) -> RBr(a, testMigi [] right) :: res;; *)
 
 (* 6.8 *)
+(* 場合分けして再帰するとなんかうまくいく *)
 
 let rtree_of_tree t =
 	let rec rtree_of_tree' = function
@@ -277,10 +278,14 @@ let rec makeXML stack res = function
 	| (PCDATA a) :: rest when stack <> [] -> makeXML stack (res ^ a) rest
 	| _ -> "dame";;
 
-(*
+(* 6.10 *)
 
-[RBr ("R",
-  [RBr ("a", [RLf]); RBr ("b", [RLf]); RBr ("b", [RLf]); RBr ("c", [RLf]);
-   RBr ("Hello", [RLf]); RBr ("c", [RLf]); RBr ("a", [RLf])])]
+type arith = Const of int | Add of arith * arith | Mul of arith * arith;;
 
- *)
+let rec eval = function
+	| Mul (left, right) -> (eval left) * (eval right)
+	| Add (left, right) -> (eval left) + (eval right)
+	| Const c -> c;;
+
+let exp = Mul (Add (Const 3, Const 4), Add (Const 2, Const 5));;
+eval exp;;
