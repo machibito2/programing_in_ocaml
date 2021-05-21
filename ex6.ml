@@ -370,6 +370,7 @@ let rec permutations lst =
 
 let a = check [] (permutations [1;2;3;4]);;
 
+(* 回答が一つの変数で表示されなかったから分けて書いておいた *)
 (*
  [[[1; 2; 3; 4]];
  [[2; 3; 4; 1]; [2; 3; 1; 4]; [2; 1; 3; 4]];
@@ -404,3 +405,25 @@ let a = check [] (permutations [1;2;3;4]);;
  BSTBr (4, BSTLf,BSTBr (3, BSTLf, BSTBr (1, BSTBr (2, BSTLf, BSTLf), BSTLf)));
  BSTBr (4, BSTLf,BSTBr (3, BSTLf, BSTBr (2, BSTLf, BSTBr (1, BSTLf, BSTLf))))]
 *)
+
+(* 6.13 *)
+(* いいね～～～～ *)
+
+type intseq = Cons of int * (int -> intseq);;
+let head (Cons (left, right)) = left;;
+let tail (Cons (left, right)) = right;;
+let rec step n x = Cons (x + n, step (n + 1));;
+let rec stepFib n x = Cons (x + n, stepFib x);;
+let fib = stepFib 1 0;;
+
+let rec nthseq n (Cons (x, f)) =
+	if n = 1 then
+		x
+	else
+		nthseq (n - 1) (f x);;
+
+let rec take n (Cons (x, f)) =
+	if n = 0 then
+		[]
+	else
+		x :: (take (n-1) (f x));;
