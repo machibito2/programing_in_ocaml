@@ -41,12 +41,14 @@ let rec overlap (x) (y) =
 		else if (a.loc_y -. tmpy -. float_of_int r <= b.loc_y) && (b.loc_y <= a.loc_y +. tmpy +. float_of_int r) && (a.loc_x -. tmpx <= b.loc_x) && (b.loc_x <= a.loc_x +. tmpx) then
 			true
 		else
+		(
 			let rec loop l =
 				match l with
 				| [] -> false
 				| (x, y) :: rest -> overlap {b with loc_x = x; loc_y = y} b || loop rest
 			in
 			loop [(a.loc_x -. tmpx, a.loc_y -. tmpy); (a.loc_x -. tmpx, a.loc_y +. tmpy); (a.loc_x +. tmpx, a.loc_y -. tmpy); (a.loc_x +. tmpx, a.loc_y +. tmpy)]
+		)
 	| (Circle r, Rectangle (l1, l2)) ->  overlap b a
 	| (Square l1, Circle r) -> overlap {a with body = Rectangle (l1, l1)} b
 	| (Circle r, Square l1) -> overlap b a
@@ -60,12 +62,14 @@ let rec overlap (x) (y) =
 		in
 		let listOfPoint = [(a.loc_x -. tmpx, a.loc_y -. tmpy); (a.loc_x -. tmpx, a.loc_y +. tmpy); (a.loc_x +. tmpx, a.loc_y -. tmpy); (a.loc_x +. tmpx, a.loc_y +. tmpy)]
 		in
+		(
 		let rec loop l =
 			match l with
 			| [] -> false
 			| (x, y) :: rest -> overlap {loc_x = x; loc_y = y; body = Point} b || loop rest
 		in
 		loop listOfPoint
+		)
 	| (Rectangle (l1, l2), Square l3) -> overlap a {b with body = Rectangle (l3, l3)}
 	| (Square l1, Rectangle (l2, l3)) -> overlap b a
 	| (Square l1, Square l2) -> overlap {a with body = Rectangle (l1, l1)} {b with body = Rectangle (l2, l2)}
@@ -414,6 +418,7 @@ let head (Cons (left, right)) = left;;
 let tail (Cons (left, right)) = right;;
 let rec step n x = Cons (x + n, step (n + 1));;
 let rec stepFib n x = Cons (x + n, stepFib x);;
+(* (int -> intseq)のほうのxは次の要素の増加分だから *)
 let fib = stepFib 1 0;;
 
 let rec nthseq n (Cons (x, f)) =
@@ -427,3 +432,88 @@ let rec take n (Cons (x, f)) =
 		[]
 	else
 		x :: (take (n-1) (f x));;
+
+(* 6.14 *)
+(* なんか下2つ遅いけどなんで～～ *)
+
+let rec prime_seq x =
+	let is_prime_1 x =
+	if x <= 1 then
+		false
+	else
+		let rec is_divisible_from_2_to n =
+			if n = x then
+				false
+			else
+				(x mod n == 0) || is_divisible_from_2_to (n + 1)
+		in
+		not (is_divisible_from_2_to (2))
+	in
+	if is_prime_1 (x + 1) then
+		Cons(x + 1, prime_seq)
+	else
+		prime_seq (x + 1);;
+
+
+
+let rec prime_seq x =
+	let is_prime_2 x =
+	let rec is_divisible_from_2_to n =
+		if x = 1 then
+			true
+		else
+			(n > 1) && ((x mod n == 0) || is_divisible_from_2_to (n-1))
+	in
+	not (is_divisible_from_2_to (int_of_float(floor (sqrt(float_of_int x)))))
+	in
+	if is_prime_2 (x + 1) then
+		Cons(x + 1, prime_seq)
+	else
+		prime_seq (x + 1);;
+
+
+
+let rec prime_seq primes x =
+	let rec is_prime_3 l x =
+	if x < 2 then
+		false
+	else
+		match l with
+		| [] -> true
+		| v :: rest ->
+			if (x mod v = 0) then
+				false
+			else
+				is_prime_3 rest x
+	in
+	if is_prime_3 primes (x + 1) then
+		Cons(x + 1, prime_seq ((x + 1) :: primes))
+	else
+		prime_seq primes (x + 1);;
+
+let rec prime_seq primes x =
+	let rec is_prime_4 l x =
+	if x < 2 then
+		false
+	else
+		match l with
+		| [] -> true
+		| v :: rest ->
+			if (x mod v) = 0 then
+				false
+			else
+			(
+				let floorx = int_of_float (floor (sqrt (float_of_int x)))
+				in
+				if (v > floorx) && floorx = 1 then
+					true
+				else
+					is_prime_4 rest x
+			)
+	in
+	if is_prime_4 primes (x + 1) then
+		Cons(x + 1, prime_seq ((x + 1) :: primes))
+	else
+		prime_seq primes (x + 1);;
+
+
